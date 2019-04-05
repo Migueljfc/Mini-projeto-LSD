@@ -1,0 +1,55 @@
+library IEEE;
+use IEEE.STD_LOGIC_1164.all;
+use IEEE.NUMERIC_STD.all;
+entity cronometrp is 
+port( clk : in std_logic;
+		reset: in std_logic;
+		H : out std_logic);
+end entity;
+architecture Behavioral of cronometrp is 
+	signal min: std_logic_vector(6 downto 0);
+	signal seg : std_logic_vector(6 downto 0);
+	begin 
+	H <= '0' ;
+	process(clk,reset)
+	signal cont := integer range 0 to 50000000 :=0;
+	signal var_min : unsigned (6 downto 0) := "0111011";
+	signal var_seg : unsigned(6 downto 0) := "1100011";
+	variable flag : std_logic := '0';
+	
+	begin
+	if(rising_edge(clk)) then
+		if reset = '1' then 
+			var_min := "0111011";
+			var_seg := "1100011";
+			cont := 0;
+			flag := '0';
+		elsif flag = '0' then 
+			cont <= cont + 1;
+			if cont = 50000000 then
+			var_seg <= var_seg - "0000001";
+				if var_seg(3 downto 0) = "1010" then
+					var_seg(6 downto 4) <= var_seg(6 downto 4) + "001";
+					var_seg(3 downto 0) <= "0000";
+					if var_seg(6 downto 4) = "110" then
+							var_min <= var_min + "0000001";
+							var_seg (6 downto 4) <= "000";
+							
+							if var_min (3 downto 0) = "1010" then
+								var_min(6 downto 4) <= var_min(6 downto 4) + "001";
+								var_min(3 downto 0) <= "0000";
+								
+								if var_min(6 downto 0) = "110" then
+									var_min(6 downto 0) <= "000";
+								end if;
+							end if;
+					end if;
+				end if;
+			end if;
+		end if;
+	end if;
+end process;
+end Behavioral;
+					
+	
+		
